@@ -1,0 +1,49 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "SudokuSolver/1.0.0": {
+        "dependencies": {
+          "SSDK.AI": "1.0.0"
+        },
+        "runtime": {
+          "SudokuSolver.dll": {}
+        }
+      },
+      "SSDK.AI/1.0.0": {
+        "dependencies": {
+          "SSDK.Core": "1.0.0"
+        },
+        "runtime": {
+          "SSDK.AI.dll": {}
+        }
+      },
+      "SSDK.Core/1.0.0": {
+        "runtime": {
+          "SSDK.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SudokuSolver/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SSDK.AI/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SSDK.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

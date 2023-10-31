@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSolver", "SudokuSolver\SudokuSolver.csproj", "{904FBD69-032F-4F0D-9B5B-C88B520D04A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSDK.AI", "..\..\SSDK.AI\SSDK.AI\SSDK.AI.csproj", "{52772695-0D2D-4E28-9969-8A9C941EEB30}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{904FBD69-032F-4F0D-9B5B-C88B520D04A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{904FBD69-032F-4F0D-9B5B-C88B520D04A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{904FBD69-032F-4F0D-9B5B-C88B520D04A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{904FBD69-032F-4F0D-9B5B-C88B520D04A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52772695-0D2D-4E28-9969-8A9C941EEB30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52772695-0D2D-4E28-9969-8A9C941EEB30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52772695-0D2D-4E28-9969-8A9C941EEB30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52772695-0D2D-4E28-9969-8A9C941EEB30}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {917C52A9-9C1C-4B07-89A0-67F5AB10664D}
+	EndGlobalSection
+EndGlobal
