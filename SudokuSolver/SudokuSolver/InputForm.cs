@@ -2,7 +2,12 @@ using SSDK.AI.Agent;
 using SSDK.AI.Agent.Info;
 using SSDK.AI.Agent.Solvers;
 using SSDK.AI.Agent.Solvers.Elimination;
+using SSDK.AI.CSP;
+using SSDK.AI.KBS;
+using SSDK.AI.KBS.Arithmetic;
+using SSDK.AI.KBS.Logic;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace SudokuSolver
 {
@@ -11,17 +16,132 @@ namespace SudokuSolver
         public InputForm()
         {
             InitializeComponent();
-            AgentThread = new Thread(Solve);
+            AgentThread = new Thread(SolveWithCSP);
             AgentThread.Start();
-            sudokuGrid1.Value = "      43 \n  3    81\n 51  4  6\n6  1    9\n   58  12\n2   4   8\n56    19 \n3  9  8  \n  76     ";
+            sudokuGrid1.Value = "8        \n  36     \n 7  9 2  \n 5   7   \n    457  \n   1   3 \n  1    68\n  85   1 \n 9    4  ";
             NextPuzzle = sudokuGrid1.Value;
         }
 
+        public static bool IsSolved = false;
         public static Thread AgentThread;
         public static bool IsAlive = true;
         public static string NextPuzzle;
         public static string Output = "";
 
+        public class SudokuCSP : CSP
+        {
+            public string State;
+
+            public CSPVariable[][] Rows = new CSPVariable[9][];
+            public CSPVariable[][] Cols = new CSPVariable[9][];
+            public CSPVariable[,][] Boxes = new CSPVariable[3, 3][];
+            public CSPVariable[] Cells = new CSPVariable[81];
+
+            public SudokuCSP(string state)
+            {
+                object[] domain = new object[9] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+                for(int xy = 0; xy < 9; xy++)
+                {
+                    Rows[xy] = new CSPVariable[9];
+                    Cols[xy] = new CSPVariable[9];
+                }
+                for(int x = 0; x < 3; x++)
+                {
+                    for(int y = 0; y < 3; y++)
+                    {
+                        Boxes[x, y] = new CSPVariable[9];
+                    }
+                }
+                State = state;
+                for (int x = 0; x < 9; x++)
+                {
+                    for(int y = 0; y < 9; y++)
+                    {
+                        CSPVariable var = $"cell({x},{y})";
+                        char value = GetValue(x, y);
+                        if (value == ' ')
+                        {
+                            var.Domain = domain;
+                        } 
+                        else
+                        {
+                            var.Domain = new object[] { value };
+                        }
+                        Rows[y][x] = var;
+                        Cols[x][y] = var;
+                        int bi = (y / 3) * 27 + (x / 3) * 3;
+                        int boxindex = ((y * 9) + x - bi) switch
+                        {
+                            0 => 0,
+                            1 => 1,
+                            2 => 2,
+                            9 => 3,
+                            10 => 4,
+                            11 => 5,
+                            18 => 6,
+                            19 => 7,
+                            20 => 8,
+                            _ => throw new Exception("Invalid implementation")
+                        };
+                        
+                        Boxes[x / 3, y / 3][boxindex] = var;
+                        Cells[y * 9 + x] = var;
+                    }
+                }
+                
+                Variables.AddRange(Cells);
+
+                // Add row constraints, every number
+                // in the row must be unique.
+                for(int xy = 0; xy < 9; xy++)
+                {
+                    AddUniqueConstraint(Rows[xy]);
+                    AddUniqueConstraint(Cols[xy]);
+                    AddContainmentConstraint(Rows[xy], domain);
+                    AddContainmentConstraint(Cols[xy], domain);
+                }
+                for(int x = 0; x < 3; x++)
+                {
+                    for(int y = 0; y < 3; y++)
+                    {
+                        AddUniqueConstraint(Boxes[x, y]);
+                        AddContainmentConstraint(Boxes[x, y], domain);
+                    }
+                }
+            }
+
+            public override void Solve()
+            {
+                IsSolved = false;
+                base.Solve();
+                IsSolved = Solved;
+                UpdateWithSolution();
+            }
+
+            public char GetValue(int x, int y)
+            {
+                return State[x + y * 10];
+            }
+
+            public void UpdateWithSolution()
+            {
+                StringBuilder b = new StringBuilder();
+                for(int y = 0; y < 9; y++)
+                {
+                    for(int x = 0; x < 9; x++)
+                    {
+                        CSPVariable cell = Cells[y * 9 + x];
+                        if (cell.Solved)
+                        {
+                            b.Append((char)cell.Solution);
+                        }
+                        else b.Append(' ');
+                    }
+                    b.Append('\n');
+                }
+                State = b.ToString();
+            }
+        }
         public class SudokuProblem : AgentProblemSpace
         {
 
@@ -359,7 +479,34 @@ namespace SudokuSolver
             }
         }
 
-        public void Solve()
+        /// <summary>
+        /// Solves the puzzle with knowledge base
+        /// </summary>
+        public void SolveWithCSP()
+        {
+            while (IsAlive)
+            {
+                Thread.Sleep(5);
+                if (NextPuzzle != null)
+                {
+                    string puzzle = NextPuzzle;
+                    NextPuzzle = null;
+                    Output = puzzle;
+
+                    SudokuCSP csp = new SudokuCSP(puzzle);
+                    csp.ReduceVariableDomains();
+                    csp.Solve();
+
+                    Output = csp.State;
+                }
+            }
+        }
+        /// <summary>
+        /// Solves the sudoku puzzle with an elimination solver on an agent.
+        /// Succeeds for low-level puzzles but fails to use complex moves that
+        /// determines boxes without single-point elimination
+        /// </summary>
+        public void SolveWithAgent()
         {
             // Create the agent's possible actions
             AgentAction[] possibleActions = new AgentAction[9 * 9 * 9];
@@ -516,6 +663,15 @@ namespace SudokuSolver
             {
                 if(Output.Length > 81)
                     sudokuGrid2.Value = Output;
+
+                if (IsSolved)
+                {
+                    label2.Text = "Result - Solved";
+                }
+                else
+                {
+                    label2.Text = "Result - Unsolved";
+                }
             }
             catch
             {
