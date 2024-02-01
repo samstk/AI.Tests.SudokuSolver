@@ -1242,6 +1242,20 @@
             if no other variable has the value in its domain, then a particular variable with that
             domain value must be solved to that value)</param>
         </member>
+        <member name="M:SSDK.AI.CSP.CSPConstraint.#ctor(SSDK.AI.CSP.CSPConstraintChecker,SSDK.AI.CSP.CSPVariable,SSDK.AI.CSP.CSPConstraintHint,System.String)">
+            <summary>
+            Creates a CSP constraint with referenced variables
+            </summary>
+            <param name="relatedVariable">the related variables of this constraint</param>
+            <param name="constraintChecker">the function to check whether the constraint holds</param>
+            <param name="hint">
+            a hint of the constraint, which allows assumptions 
+            of a particular value of a variable to be made based on the dynamics of the constraint<br/>
+            (e.g. a containment constraint - see AddContainmentConstraint - requires that the
+            given list of variables' domains must contain a domain value at least once, and
+            if no other variable has the value in its domain, then a particular variable with that
+            domain value must be solved to that value)</param>
+        </member>
         <member name="P:SSDK.AI.CSP.CSPConstraint.Holds">
             <summary>
             Gets whether the constraint holds
